@@ -10,15 +10,43 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161127211921) do
+ActiveRecord::Schema.define(version: 20161227063034) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "courses", force: :cascade do |t|
+    t.string   "name"
+    t.integer  "school_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer  "owner_id"
+    t.index ["owner_id"], name: "index_courses_on_owner_id", using: :btree
+    t.index ["school_id"], name: "index_courses_on_school_id", using: :btree
+  end
 
   create_table "schools", force: :cascade do |t|
     t.string   "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "user_courses", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "course_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_id"], name: "index_user_courses_on_course_id", using: :btree
+    t.index ["user_id"], name: "index_user_courses_on_user_id", using: :btree
+  end
+
+  create_table "user_schools", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "school_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["school_id"], name: "index_user_schools_on_school_id", using: :btree
+    t.index ["user_id"], name: "index_user_schools_on_user_id", using: :btree
   end
 
   create_table "users", force: :cascade do |t|
@@ -34,8 +62,14 @@ ActiveRecord::Schema.define(version: 20161127211921) do
     t.inet     "last_sign_in_ip"
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
+    t.string   "name"
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   end
 
+  add_foreign_key "courses", "users", column: "owner_id"
+  add_foreign_key "user_courses", "courses"
+  add_foreign_key "user_courses", "users"
+  add_foreign_key "user_schools", "schools"
+  add_foreign_key "user_schools", "users"
 end
